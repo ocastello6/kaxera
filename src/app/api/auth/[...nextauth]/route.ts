@@ -16,6 +16,11 @@ const handler = NextAuth({
           return null;
         }
 
+        // Solución temporal para Vercel: saltarnos la base de datos local (SQLite) para el admin
+        if (credentials.email === "admin@kaxera.com" && credentials.password === "pwd") {
+          return { id: "admin-id", email: "admin@kaxera.com", name: "Administrador" };
+        }
+
         const user = await prisma.user.findUnique({
           where: { email: credentials.email }
         });
