@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id               String            @id @default(cuid())
+  email            String            @unique
+  name             String?
+  password         String
+  createdAt        DateTime          @default(now())
+  invoices         Invoice[]
+  expenses         Expense[]
+  employees        Employee[]
+  contacts         Contact[]
+  bankTransactions BankTransaction[]
+  recurring        RecurringInvoice[]
+  events           CalendarEvent[]
+  settings         CompanySettings?
+}
+
+model Invoice {
+  id          String   @id @default(cuid())
+  invoiceNum  String
+  date        DateTime
+  clientName  String
+  clientNif   String
+  amount      Float
+  vat         Float
+  status      String   @default("PENDIENTE") // PAGADA, PENDIENTE
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Expense {
+  id           String   @id @default(cuid())
+  date         DateTime
+  providerName String
+  concept      String
+  amount       Float
+  vat          Float
+  category     String?
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+model Employee {
+  id        String    @id @default(cuid())
+  name      String
+  dni       String
+  ssNum     String
+  startDate DateTime
+  endDate   DateTime?
+  gross     Float     @default(0)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+}
+  
+model Contact {  
+  id String @id @default(cuid())  
+  type String  
+  name String  
+  nif String  
+  address String  
+  email String  
+  phone String  
+  userId String  
+  user User @relation(fields: [userId], references: [id])  
+  createdAt DateTime @default(now())  
+}  
+  
+model BankTransaction {  
+  id String @id @default(cuid())  
+  date DateTime  
+  description String  
+  amount Float  
+  matchedInvoiceId String?  
+  userId String  
+  user User @relation(fields: [userId], references: [id])  
+  createdAt DateTime @default(now())  
+}  
+  
+model RecurringInvoice {  
+  id String @id @default(cuid())  
+  client String  
+  concept String  
+  amount Float  
+  period String  
+  nextDate DateTime  
+  active Boolean @default(true)  
+  userId String  
+  user User @relation(fields: [userId], references: [id])  
+  createdAt DateTime @default(now())  
+} 
+  
+model CalendarEvent {  
+  id String @id @default(cuid())  
+  dateKey String  
+  title String  
+  color String  
+  userId String  
+  user User @relation(fields: [userId], references: [id])  
+  createdAt DateTime @default(now())  
+}  
+  
+model CompanySettings {  
+  id String @id @default(cuid())  
+  name String  
+  nif String  
+  address String  
+  accountantEmail String?  
+  accountantName String?
+  logoUrl String?
+  userId String @unique  
+  user User @relation(fields: [userId], references: [id])  
+  createdAt DateTime @default(now())  
+} 
